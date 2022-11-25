@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Primary
@@ -26,28 +27,19 @@ public class CustomerServiceImpl implements ICustomerService {
     @Override
     public Customer addCustomer(Customer c) {
         // System.out.println(c);
-        Customer customer = customerRepository.findById(c.getId());
+       Customer customer = customerRepository.findCustomerByEmailAndNames(c.getEmail(), c.getNames());
+      
         if (customer != null) {
-            throw new CustomerAlreadyRegisteredException("Customer Already Registered: " + customer.getId());
+            System.out.println(customer.getEmail());
+            throw new CustomerAlreadyRegisteredException("Customer Already Registered: " );
         }
         // return null;
        return customerRepository.save(c);
     }
 
-    @Override
-    public Integer doLogin(String email, String names) {
-        Integer customerId = null;
-        try {
-            customerId = customerRepository.findCustomerByEmailAndNames(email, names);
-            logger.info( customerId + " Logged In Successfully");
-            return customerId;
-        } catch (Exception e) {
-            throw new CustomerNotFoundException("Not Found: " + customerId);
-        }
-    }
 
     public Customer updateCustomer(Customer c) {
-        Customer customer = customerRepository.findById(Math.toIntExact(c.getId()))
+        Customer customer = customerRepository.findById(c.getId())
                 .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + c.getId()));
         BeanUtils.copyProperties(c, customer);
         return customerRepository.save(customer);
@@ -59,10 +51,7 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public Customer getCustomerById(int customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
-        logger.info("Customer Found: " + customerId);
-        return customer;
+    public Optional<Customer> findById(Long id) {
+        return customerRepository.findById(id);
     }
 }

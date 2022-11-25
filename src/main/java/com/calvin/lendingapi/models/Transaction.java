@@ -81,6 +81,9 @@ public class Transaction {
         return updatedAt;
     }
 
+    @PrePersist()
+    public void setLastUpdate() {  this.createdAt = new Date(); }
+
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }

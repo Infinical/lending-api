@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/customer")
@@ -43,17 +44,11 @@ public class CustomerController {
         return new ResponseEntity<List<Customer>>(customerService.getCustomers(), HttpStatus.OK);
     }
 
-    // Customer Login
-
-    @PostMapping("/login")
-    public ResponseEntity<Integer> doLogin(@RequestParam String email, @RequestParam String password) {
-        return new ResponseEntity<Integer>(customerService.doLogin(email, password), HttpStatus.OK);
-    }
 
     // Fetching Customer By Customer Id
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable int id) {
-        return new ResponseEntity<Customer>(customerService.getCustomerById(id), HttpStatus.OK);
+    public ResponseEntity<Optional<Customer>> getCustomer(@PathVariable Long id) {
+        return new ResponseEntity<Optional<Customer>>(customerService.findById(id), HttpStatus.OK);
     }
 }

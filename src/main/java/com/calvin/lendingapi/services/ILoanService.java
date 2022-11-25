@@ -7,7 +7,7 @@ import java.util.List;
 public interface ILoanService {
     public Loan applyLoan(Loan l);
 
-    public List<Loan> getLoansByCustomerId(int custId);
+    public List<Loan> getLoansByCustomerId(Long custId);
 
     public void foreCloseLoan(int loanId);
 }

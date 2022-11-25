@@ -4,10 +4,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "loan")
@@ -26,12 +24,9 @@ public class Loan {
     @Column(name = "interest_rate")
     private double interestRate;
 
-    @ManyToOne
-    @JoinColumn(name = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    // @JoinColumn(name = "customer_id", referencedColumnName = "id" )
     private Customer customer;
-
-    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Transaction> transactions = new ArrayList<Transaction>();
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,7 +35,7 @@ public class Loan {
 
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at" )
+    @Column(name = "updated_at")
     private Date updatedAt;
 
     public Long getId() {
@@ -83,18 +78,18 @@ public class Loan {
         this.customer = customer;
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
+    // public List<Transaction> getTransactions() {
+    // return transactions;
+    // }
 
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-    }
+    // public void setTransactions(List<Transaction> transactions) {
+    // this.transactions = transactions;
+    // }
 
-    public void addTransaction(Transaction transation) {
-        transation.setLoan(this);
-        this.getTransactions().add(transation);
-    }
+    // public void addTransaction(Transaction transation) {
+    // transation.setLoan(this);
+    // this.getTransactions().add(transation);
+    // }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -102,6 +97,11 @@ public class Loan {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @PrePersist()
+    public void setLastUpdate() {
+        this.createdAt = new Date();
     }
 
     public Date getUpdatedAt() {

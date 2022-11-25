@@ -19,13 +19,13 @@ public class LoanController {
     private ILoanService loanService;
 
     @PostMapping
-    public ResponseEntity<Loan> applyLoan(@RequestBody Loan loan) {
-        return new ResponseEntity<Loan>(loanService.applyLoan(loan), HttpStatus.OK);
+    public Loan applyLoan(@RequestBody Loan loan) {
+        return loanService.applyLoan(loan);
     }
 
     @GetMapping("/customer/{id}")
-    public ResponseEntity<List<Loan>> getLoansByCustomerId(@PathVariable int id) {
-        return new ResponseEntity<List<Loan>>(loanService.getLoansByCustomerId(id), HttpStatus.OK);
+    public List<Loan> getLoansByCustomerId(@PathVariable Long id) {
+        return loanService.getLoansByCustomerId(id);
     }
 
     @DeleteMapping("/foreclose/{loanId}")

@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements ITransactionService {
     public Transaction addTransaction(Transaction transaction) {
         int loanId = Math.toIntExact(transaction.getLoan().getId());
         Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException("Loan Not Found: " + loanId));
-        loan.addTransaction(transaction);
+        // loan.addTransaction(transaction);
         try {
             return transactionRepository.save(transaction);
         } catch (Exception e) {
@@ -47,15 +47,15 @@ public class TransactionServiceImpl implements ITransactionService {
         }
     }
 
-    @Override
-    public List<Transaction> getTransactionsByCustId(int customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
-        try {
-            List<Transaction> transactions = transactionRepository.findTransactionsByCustomerId(customerId);
-            return transactions;
-        } catch (Exception e) {
-            throw new TransactionsNotFoundException("Transactions not Found for Customer Id: " + customerId);
-        }
-    }
+    // @Override
+    // public List<Transaction> getTransactionsByCustId(int customerId) {
+    //     Customer customer = customerRepository.findById(customerId)
+    //             .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
+    //     try {
+    //         List<Transaction> transactions = transactionRepository.findTransactionsByCustomerId(customerId);
+    //         return transactions;
+    //     } catch (Exception e) {
+    //         throw new TransactionsNotFoundException("Transactions not Found for Customer Id: " + customerId);
+    //     }
+    // }
 }

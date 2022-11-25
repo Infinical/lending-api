@@ -22,8 +22,8 @@ public class TransactionController {
         return new ResponseEntity<Transaction>(transactionService.addTransaction(trans), HttpStatus.OK);
     }
 
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<List<Transaction>> getTransactionsByCustId(@PathVariable int id) {
-        return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByCustId(id), HttpStatus.OK);
-    }
+    // @GetMapping("/customer/{id}")
+    // public ResponseEntity<List<Transaction>> getTransactionsByCustId(@PathVariable int id) {
+    //     return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByCustId(id), HttpStatus.OK);
+    // }
 }

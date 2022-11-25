@@ -3,15 +3,22 @@ package com.calvin.lendingapi.services;
 import com.calvin.lendingapi.models.Customer;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICustomerService {
-    public Integer doLogin(String email, String password);
+    public List<Customer> getCustomers();
 
     public Customer addCustomer(Customer c);
 
     public Customer updateCustomer(Customer c);
 
-    public List<Customer> getCustomers();
+    public Optional<Customer> findById(Long id);
 
-    public Customer getCustomerById(int custId);
+    // public Long doLogin(String email, String names);
+
+  
+
+  
+
+    // public Customer getCustomerById(Long id);
 }

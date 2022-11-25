@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Primary
@@ -26,24 +27,35 @@ public class LoanServiceImpl implements ILoanService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Loan applyLoan(Loan loan) {
-        int customerId = Math.toIntExact(loan.getCustomer().getId());
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Cusotmer Not Found: " + customerId));
-        customer.addLoan(loan);
+    public Loan applyLoan(Loan loan)  {
+       Optional <Customer> customer = customerRepository.findById(loan.getCustomer().getId());
+        if (customer.isEmpty()) {
+           throw new CustomerNotFoundException("Customer not found");
+        }
+        var cust = customer.get();
+        cust.addLoan(loan);
+        // loan.setCustomer(cust);
+        // customer.get().addLoan(loan);
         return loanRepository.save(loan);
     }
 
     @Override
-    public List<Loan> getLoansByCustomerId(int customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
-        return customer.getLoans();
+    public List<Loan> getLoansByCustomerId(Long customerId) {
+       
+        Optional <Customer> customer = customerRepository.findById(customerId);
+        if (customer.isEmpty()) {
+           throw new CustomerNotFoundException("Customer not found");
+        }
+
+       return loanRepository.findByCustomerId(customerId);
+        // System.out.println(customer.getEmail());
+                // .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
     }
 
     @Override
     public void foreCloseLoan(int loanId) {
-        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException("Loan Not Found: " + loanId));
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new LoanNotFoundException("Loan Not Found: " + loanId));
         loanRepository.delete(loan);
     }
 }

@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="customers")
+@Table(name = "customers")
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
     @Column(name = "id_number")
@@ -32,8 +32,8 @@ public class Customer {
     @Column(name = "tax_pin")
     private String taxPin;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Loan> loans = new ArrayList<Loan>();
+    @OneToMany(mappedBy = "customer",  cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Loan> loans = new ArrayList<>();;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,7 +42,7 @@ public class Customer {
 
     @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at" )
+    @Column(name = "updated_at")
     private Date updatedAt;
 
     public Long getId() {
@@ -93,18 +93,21 @@ public class Customer {
         this.taxPin = taxPin;
     }
 
-    public List<Loan> getLoans() {
-        return loans;
+    public void addLoan(Loan loan) {
+        loans.add(loan);
+        loan.setCustomer(this);
     }
-
-
-    public void setLoans(List<Loan> loans) {
-        this.loans = loans;
+ 
+    public void removeLoan(Loan loan) {
+        loans.add(loan);
+        loan.setCustomer(this);
     }
 
     public Date getCreatedAt() {
         return createdAt;
     }
+
+
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
@@ -119,12 +122,9 @@ public class Customer {
     }
 
     @PrePersist()
-public void setLastUpdate() {  this.createdAt = new Date(); }
-
-    // the method below will add Loan to LoansList
-    // also serves the purpose to avoid cyclic references.
-    public void addLoan(Loan loan) {
-        loan.setCustomer(this); // this will avoid nested cascade
-        this.getLoans().add(loan);
+    public void setLastUpdate() {
+        this.createdAt = new Date();
     }
+
+  
 }
