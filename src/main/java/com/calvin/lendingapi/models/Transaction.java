@@ -1,39 +1,44 @@
 package com.calvin.lendingapi.models;
 
+import com.calvin.lendingapi.listeners.TransactionListener;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Table(name = "transaction")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EntityListeners(TransactionListener.class)
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "transaction_time")
-    private Timestamp transactionTime;
+    @Column(name = "amount")
+    private double amount;
 
-    @Column(name = "message")
-    private String message;
-
-    @ManyToOne
-    @JoinColumn(name = "loanId", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Loan loan;
 
-
     @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
+  @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
     @LastModifiedDate
-    @Temporal(TemporalType.TIMESTAMP)
+   @UpdateTimestamp
     @Column(name = "updated_at" )
     private Date updatedAt;
 
@@ -45,21 +50,14 @@ public class Transaction {
         this.id = id;
     }
 
-    public Timestamp getTransactionTime() {
-        return transactionTime;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setTransactionTime(Timestamp transactionTime) {
-        this.transactionTime = transactionTime;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public Loan getLoan() {
         return loan;
@@ -81,10 +79,8 @@ public class Transaction {
         return updatedAt;
     }
 
-    @PrePersist()
-    public void setLastUpdate() {  this.createdAt = new Date(); }
-
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

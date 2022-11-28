@@ -4,8 +4,8 @@ import com.calvin.lendingapi.exceptions.CustomerAlreadyRegisteredException;
 import com.calvin.lendingapi.exceptions.CustomerNotFoundException;
 import com.calvin.lendingapi.models.Customer;
 import com.calvin.lendingapi.repository.CustomerRepository;
-import org.slf4j.Logger;
 import com.calvin.lendingapi.services.ICustomerService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,6 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public Optional<Customer> findById(Long id) {
-        return customerRepository.findById(id);
+        return Optional.ofNullable(customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer Not Found")));
     }
 }

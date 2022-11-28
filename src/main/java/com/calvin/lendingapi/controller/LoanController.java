@@ -28,9 +28,9 @@ public class LoanController {
         return loanService.getLoansByCustomerId(id);
     }
 
-    @DeleteMapping("/foreclose/{loanId}")
-    public ResponseEntity<String> forecloseLoan(@PathVariable int loanId) {
-        loanService.foreCloseLoan(loanId);
+    @GetMapping("/clear/{loanId}")
+    public ResponseEntity<String> forecloseLoan(@PathVariable Long loanId) {
+        loanService.clearLoan(loanId);
         return new ResponseEntity<String>("Loan Foreclosed with Loan Id: " + loanId, HttpStatus.OK);
     }
 }

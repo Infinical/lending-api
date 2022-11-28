@@ -2,7 +2,6 @@ package com.calvin.lendingapi.services.impl;
 
 import com.calvin.lendingapi.exceptions.CustomerNotFoundException;
 import com.calvin.lendingapi.exceptions.LoanNotFoundException;
-import com.calvin.lendingapi.exceptions.TransactionFailedException;
 import com.calvin.lendingapi.exceptions.TransactionsNotFoundException;
 import com.calvin.lendingapi.models.Customer;
 import com.calvin.lendingapi.models.Loan;
@@ -18,6 +17,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Primary
@@ -33,29 +33,28 @@ public class TransactionServiceImpl implements ITransactionService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-
     @Override
     public Transaction addTransaction(Transaction transaction) {
-        int loanId = Math.toIntExact(transaction.getLoan().getId());
-        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new LoanNotFoundException("Loan Not Found: " + loanId));
-        // loan.addTransaction(transaction);
-        try {
-            return transactionRepository.save(transaction);
-        } catch (Exception e) {
-            throw new TransactionFailedException("Transaction Failed for LoanId: " + loanId);
+
+        Optional<Loan> loan = loanRepository.findById(transaction.getLoan().getId());
+
+        if (loan.isEmpty()) {
+            throw new LoanNotFoundException("Loan not found");
         }
+        var getLoan = loan.get();
+        getLoan.addTransaction(transaction);
+        return transactionRepository.save(transaction);
     }
 
-    // @Override
-    // public List<Transaction> getTransactionsByCustId(int customerId) {
-    //     Customer customer = customerRepository.findById(customerId)
-    //             .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
-    //     try {
-    //         List<Transaction> transactions = transactionRepository.findTransactionsByCustomerId(customerId);
-    //         return transactions;
-    //     } catch (Exception e) {
-    //         throw new TransactionsNotFoundException("Transactions not Found for Customer Id: " + customerId);
-    //     }
-    // }
+    @Override
+    public List<Transaction> getTransactionsByCustId(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
+        try {
+            List<Transaction> transactions = transactionRepository.findTransactionsByCustomerId(customerId);
+            return transactions;
+        } catch (Exception e) {
+            throw new TransactionsNotFoundException("Transactions not Found for Customer Id: " + customerId);
+        }
+    }
 }

@@ -11,8 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,10 +35,8 @@ public class LoanServiceImpl implements ILoanService {
         if (customer.isEmpty()) {
            throw new CustomerNotFoundException("Customer not found");
         }
-        var cust = customer.get();
-        cust.addLoan(loan);
-        // loan.setCustomer(cust);
-        // customer.get().addLoan(loan);
+        var getCustomer = customer.get();
+        getCustomer.addLoan(loan);
         return loanRepository.save(loan);
     }
 
@@ -48,14 +49,30 @@ public class LoanServiceImpl implements ILoanService {
         }
 
        return loanRepository.findByCustomerId(customerId);
-        // System.out.println(customer.getEmail());
-                // .orElseThrow(() -> new CustomerNotFoundException("Customer Not Found: " + customerId));
     }
 
     @Override
-    public void foreCloseLoan(int loanId) {
+    public void clearLoan(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new LoanNotFoundException("Loan Not Found: " + loanId));
-        loanRepository.delete(loan);
+        loan.setForeClosed(true);
+        loanRepository.save(loan);
+    }
+
+    @Override
+    @Scheduled(cron = "@daily")
+    @Async
+    public void markDefaulted()  {
+        logger.info("Marking Default");
+        List<Loan> loans = loanRepository.findByExpiryDateLessThanEqual(new Date());
+        loans.forEach(loan -> {
+            Optional<Loan> fetchedLoan = loanRepository.findById(loan.getId());
+            fetchedLoan.get().setDefaulted(true);
+            System.out.println(fetchedLoan.get().isDefaulted());
+            loanRepository.save(fetchedLoan.get());
+        });
+//
+
+//        loanRepository.saveAll(loans);
     }
 }

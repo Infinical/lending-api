@@ -18,12 +18,12 @@ public class TransactionController {
     private ITransactionService transactionService;
 
     @PostMapping("/")
-    public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction trans) {
-        return new ResponseEntity<Transaction>(transactionService.addTransaction(trans), HttpStatus.OK);
+    public Transaction addTransaction(@RequestBody Transaction trans) {
+        return transactionService.addTransaction(trans);
     }
 
-    // @GetMapping("/customer/{id}")
-    // public ResponseEntity<List<Transaction>> getTransactionsByCustId(@PathVariable int id) {
-    //     return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByCustId(id), HttpStatus.OK);
-    // }
+    @GetMapping("/customer/{id}")
+    public List<Transaction> getTransactionsByCustId(@PathVariable Long id) {
+        return transactionService.getTransactionsByCustId(id);
+    }
 }

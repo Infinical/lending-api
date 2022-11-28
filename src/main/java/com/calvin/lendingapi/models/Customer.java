@@ -1,15 +1,20 @@
 package com.calvin.lendingapi.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "customers")
 public class Customer {
     @Id
@@ -32,7 +37,7 @@ public class Customer {
     @Column(name = "tax_pin")
     private String taxPin;
 
-    @OneToMany(mappedBy = "customer",  cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Loan> loans = new ArrayList<>();;
 
     @CreatedDate
@@ -97,7 +102,7 @@ public class Customer {
         loans.add(loan);
         loan.setCustomer(this);
     }
- 
+
     public void removeLoan(Loan loan) {
         loans.add(loan);
         loan.setCustomer(this);
@@ -106,8 +111,6 @@ public class Customer {
     public Date getCreatedAt() {
         return createdAt;
     }
-
-
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
@@ -126,5 +129,4 @@ public class Customer {
         this.createdAt = new Date();
     }
 
-  
 }

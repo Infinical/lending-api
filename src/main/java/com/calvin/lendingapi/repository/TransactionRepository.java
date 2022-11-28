@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     @Query("select t from Transaction t inner join Loan l on l.id=t.loan.id where l.customer.id=?1")
-    List<Transaction> findTransactionsByCustomerId(int customerId);
+    List<Transaction> findTransactionsByCustomerId(Long customerId);
 }

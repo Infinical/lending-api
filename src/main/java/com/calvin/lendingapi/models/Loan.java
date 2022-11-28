@@ -1,14 +1,24 @@
 package com.calvin.lendingapi.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Optional;
+import java.util.List;
 
 @Entity
+
+
 @Table(name = "loan")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,12 +31,24 @@ public class Loan {
     @Column(name = "duration")
     private int duration;
 
-    @Column(name = "interest_rate")
-    private double interestRate;
+    @Column(name = "loan_balance")
+    private double loanBalance;
+
+    @Column(name = "expiry_date")
+    private Date expiryDate;
+
+    @Column(name = "is_defaulted",columnDefinition = "bool default false")
+    private boolean isDefaulted;
+
+    @Column(name = "is_foreClosed", columnDefinition = "bool default false")
+    private boolean isForeClosed;
 
     @ManyToOne(fetch = FetchType.LAZY)
     // @JoinColumn(name = "customer_id", referencedColumnName = "id" )
     private Customer customer;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
@@ -62,12 +84,29 @@ public class Loan {
         this.duration = duration;
     }
 
-    public double getInterestRate() {
-        return interestRate;
+
+    public double getLoanBalance() {
+        return loanBalance;
     }
 
-    public void setInterestRate(double interestRate) {
-        this.interestRate = interestRate;
+    public void setLoanBalance(double loanBalance) {
+        this.loanBalance = loanBalance;
+    }
+
+    public boolean isDefaulted() {
+        return isDefaulted;
+    }
+
+    public void setDefaulted(boolean defaulted) {
+        isDefaulted = defaulted;
+    }
+
+    public void setForeClosed(boolean foreClosed) {
+        isForeClosed = foreClosed;
+    }
+
+    public boolean isForeClosed() {
+        return isForeClosed;
     }
 
     public Customer getCustomer() {
@@ -78,30 +117,38 @@ public class Loan {
         this.customer = customer;
     }
 
-    // public List<Transaction> getTransactions() {
-    // return transactions;
-    // }
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+        transaction.setLoan(this);
+    }
 
-    // public void setTransactions(List<Transaction> transactions) {
-    // this.transactions = transactions;
-    // }
-
-    // public void addTransaction(Transaction transation) {
-    // transation.setLoan(this);
-    // this.getTransactions().add(transation);
-    // }
+    public void removeTransaction(Transaction transaction) {
+        transactions.remove(transaction);
+        transaction.setLoan(this);
+    }
 
     public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public Date getExpiryDate() {
+        return expiryDate;
     }
 
-    @PrePersist()
-    public void setLastUpdate() {
+    public void setExpiryDate(Date expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    @PrePersist
+    public void setCreatedAt() {
         this.createdAt = new Date();
+        this.loanBalance = this.loanAmount;
+        addTime(this.duration);
+    }
+
+    @PreUpdate()
+    public void setLastUpdate() {
+     this.updatedAt = new Date();
     }
 
     public Date getUpdatedAt() {
@@ -110,5 +157,12 @@ public class Loan {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void addTime(int duration) {
+        Calendar cl = Calendar. getInstance();
+        cl.setTime(this.createdAt);
+         cl.add(Calendar.MONTH, duration);
+        this.setExpiryDate(cl.getTime());
     }
 }

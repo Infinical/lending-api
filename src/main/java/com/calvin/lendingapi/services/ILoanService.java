@@ -9,5 +9,9 @@ public interface ILoanService {
 
     public List<Loan> getLoansByCustomerId(Long custId);
 
-    public void foreCloseLoan(int loanId);
+    public void clearLoan(Long loanId);
+
+    public void markDefaulted();
+
+
 }
